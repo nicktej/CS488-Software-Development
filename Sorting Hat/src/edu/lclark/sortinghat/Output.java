@@ -11,21 +11,19 @@ public class Output {
     private Section section;
     private SortingHat sortingHat;
     private SortingHatMain sortingHatMain;
-    private GreedyAlgorithm greedyAlgorithm;
     private HungarianAlgorithm hungarianAlgorithm;
     private Student student;
     private FileWriter csvOutput;
     ArrayList<Section> sections;
     ArrayList<Student> students;
+    ArrayList<Student> assigned;
 
     // Constructor creates Output
-    public Output(ArrayList<Section> sections, ArrayList<Student> students) {
+    public Output(ArrayList<Section> sections, ArrayList<Student> students, ArrayList<Student> preassigned) {
 
-        greedyAlgorithm = new GreedyAlgorithm(sections, students);
-        greedyAlgorithm.run();
-
-        sections = greedyAlgorithm.getSections();
-        students = greedyAlgorithm.getStudents();
+        this.sections = sections;
+        this.students = students;
+        this.assigned = preassigned;
         StringBuilder sb = new StringBuilder();
         String outputFile = "eanddsorted.csv";
         String userHomeFolder = System.getProperty("user.home");
@@ -38,32 +36,30 @@ public class Output {
             int fileEnd = 2;
             while (alreadyExists) {
                 String testOutputFileName = "eanddsorted" + Integer.toString(fileEnd) + ".csv";
-                alreadyExists =  new File(testOutputFileName).exists();
-                fileEnd ++;
+                alreadyExists = new File(userHomeFolder, testOutputFileName).exists();
+                fileEnd++;
                 outputFile = testOutputFileName;
             }
+
             PrintWriter pw = new PrintWriter(new File(userHomeFolder, outputFile));
             if (!alreadyExists) {
-                sb.append("section");
-                sb.append(",");
                 sb.append("student id");
+                sb.append(",");
+                sb.append("section");
                 sb.append("\n");
 
-                for (int i = 0; i < sections.size(); i++) {
-                    sb.append(sections.get(i));
+                for (Student s : students) {
+                    sb.append(s.getStudentNo());
                     sb.append(",");
-                    int size = sections.get(i).getSize();
-                    ArrayList<Student> studentList = sections.get(i).getStudents();
-                    int innerSize = studentList.size();
-                    for (int j = 0; j < innerSize; j++) {
-                        String data = studentList.get(j).getStudentNo();
-                        sb.append(data);
-                        if (j != innerSize - 1) {
-                            sb.append(",");
-                        }
-                    }
+                    sb.append(s.getAssignedSection());
                     sb.append("\n");
+                }
 
+                for (Student s : assigned) {
+                    sb.append(s.getStudentNo());
+                    sb.append(",");
+                    sb.append(s.getAssignedSection());
+                    sb.append("\n");
                 }
 
                 pw.write(sb.toString());

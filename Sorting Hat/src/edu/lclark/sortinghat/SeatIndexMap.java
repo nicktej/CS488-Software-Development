@@ -14,14 +14,19 @@ public class SeatIndexMap {
     private ArrayList<Section> sections;
     private Hashtable<Section, Integer> sectionTable;
 
-    public SeatIndexMap(ArrayList<Section> s, int n) {
-        sections = s;
+    public SeatIndexMap(ArrayList<Section> sections, int n) {
+        this.sections = sections;
         numSeats = n;
         //build all the seats
         seats = new ArrayList<>();
-        for (int i = 0; i < s.size(); i++) {
-            for (int j = 0; j < s.get(i).getSize(); j++) {
-                seats.add(new Seat(s.get(i)));
+//        for (int i = 0; i < s.size(); i++) {
+//            for (int j = 0; j < (s.get(i).getSize() - s.get(i).getNumStudents()); j++) {
+//                seats.add(new Seat(s.get(i)));
+//            }
+//        }
+        for (Section s : sections) {
+            for (int i = 0; i < s.getNumAvailableSeats(); i++) {
+                seats.add(new Seat(s));
             }
         }
         // Build our lookup tables
@@ -29,7 +34,7 @@ public class SeatIndexMap {
         sectionTable = new Hashtable<>();
         for (Section sec : sections) {
             sectionTable.put(sec, start);
-            start += sec.getSize();
+            start += sec.getNumAvailableSeats();
         }
     }
 
@@ -41,12 +46,22 @@ public class SeatIndexMap {
      */
     public int[] getIndices(Section s) {
         int start = sectionTable.get(s);
-        int size = s.getSize();
+        int size = s.getNumAvailableSeats();
         int[] indices = new int[size];
-        for (int i =0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             indices[i] = start + i;
         }
         return indices;
+    }
+
+    public int[] getIndices(String s) {
+        for (Section sec : sections) {
+            if (sec.getSectionNo().equals(s)) {
+                return getIndices((sec));
+            }
+        }
+        System.out.println(s);
+        throw new java.lang.Error("Not a section number");
     }
 
 //    public int[] getIndices(String section) {
@@ -67,7 +82,7 @@ public class SeatIndexMap {
 
     /**
      * Returns the section of a given seat number
-     * */
+     */
     public Section getSection(int s) {
         return seats.get(s).section;
     }

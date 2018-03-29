@@ -14,7 +14,7 @@ public class StudentTest {
     Section pref3 = new Section("107-13", "Harmon", 2);
 
     private ArrayList<Section> preferences;
-    private ArrayList<String> prevProfs;
+//    private ArrayList<String> prevProfs;
     private Student student;
 
     @Before
@@ -23,17 +23,17 @@ public class StudentTest {
         preferences.add(pref1);
         preferences.add(pref2);
         preferences.add(pref3);
-        prevProfs = new ArrayList<String>();
-        prevProfs.add("Drake");
-        student = new Student("420", preferences, true, false, prevProfs);
+//        prevProfs = new ArrayList<>();
+//        prevProfs.add("Drake");
+        student = new Student("420", preferences, true, false, null);
     }
 
     @Test
     public void studentCreated() {
-        Assert.assertEquals(student.getStudentNo(), 420);
+        Assert.assertEquals(student.getStudentNo(), "420");
         Assert.assertEquals(student.getPreferences(), preferences);
         Assert.assertEquals(student.getGender(), true);
         Assert.assertEquals(student.getAthlete(), false);
-        Assert.assertEquals(student.getPrevProfs().get(0), "Drake");
+//        Assert.assertEquals(student.getPrevProfs().get(0), "Drake");
     }
 }

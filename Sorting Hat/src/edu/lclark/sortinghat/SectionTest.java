@@ -19,17 +19,4 @@ public class SectionTest {
         Assert.assertEquals(section.getProf(), "Drake");
     }
 
-    @Test
-    public void sectionContainsStudents() {
-        //TODO: Write this
-        Assert.fail("Not written yet");
-    }
-
-    @Test
-    public void sectionCappedAt19() {
-        //TODO: Write this
-        Assert.fail("Not written yet");
-    }
-
-
 }

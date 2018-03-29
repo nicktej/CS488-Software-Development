@@ -1,5 +1,6 @@
 package edu.lclark.sortinghat;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
@@ -9,6 +10,9 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
 
 public class GUI extends JFrame {
 
@@ -31,6 +35,7 @@ public class GUI extends JFrame {
     private JProgressBar progressBar;
     private String sectionFilePath;
     private String studentFilePath;
+    private Report report;
 
 
     // Constructor creates GUI, including buttons and progress bar
@@ -101,7 +106,6 @@ public class GUI extends JFrame {
         add(labelProgressBar, new GBC(0, 4, 1, 1).setFill(GBC.BOTH).setWeight(100, 100));
         add(output, new GBC(1, 4, 1, 1).setFill(GBC.BOTH).setWeight(100, 100));
         add(progressBar, new GBC(0, 5, 2, 1).setFill(GBC.BOTH).setWeight(100, 100));
-
     }
 
     private class BrowseStudents implements ActionListener {
@@ -113,8 +117,6 @@ public class GUI extends JFrame {
             jfc.setAcceptAllFileFilterUsed(false);
             FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV files", "csv");
             jfc.addChoosableFileFilter(filter);
-            jfc.setFileFilter(filter);
-            jfc.setAcceptAllFileFilterUsed(true);
 
             int returnValue = jfc.showOpenDialog(GUI.this);
             // int returnValue = jfc.showSaveDialog(null);
@@ -189,6 +191,7 @@ public class GUI extends JFrame {
             sortingHatMain = new SortingHatMain(sectionFilePath, studentFilePath);
 //            sortingHatMain.printParse();
             // Run Sorting Hat
+            report = new Report(sortingHatMain.getSortingHat().getSections(), sortingHatMain.getSortingHat().getStudents());
             run.setEnabled(false);
             ProgressWorker pw = new ProgressWorker();
             pw.addPropertyChangeListener(new PropertyChangeListener() {
@@ -226,7 +229,24 @@ public class GUI extends JFrame {
 //                double progress = sortingHat.getGreedyAlgorithm().getSections().size() /
 //                setProgress();
                 if (i == 100) {
+                    double[] percentages = report.percentages();
+
                     output.setText("Output file created at User folder");
+                    for (int j = 0; j < 6; j++) {
+                        String previous = output.getText();
+                        output.setText(previous + "\n The percentage of students in their number " + (j + 1) + " choice is: " + (((int) (10000 * percentages[j])) / 100.0) + "%");
+                    }
+                    String previous = output.getText();
+                    output.setText(previous + "\nThe number of students who did not get any of their preferences is: " + (report.numStudentsGotNoPreferences()));
+                    ArrayList<String> badStudents = report.studentsWithIllegalPreferences();
+                    if (badStudents.size() != 0) {
+                        previous = output.getText() + "\nThese students listed a previous professor in their preferences:";
+                        for (String s : badStudents) {
+                            previous = previous + " " + s;
+                        }
+                        output.setText(previous);
+                    }
+
                 }
                 try {
                     Thread.sleep(10);

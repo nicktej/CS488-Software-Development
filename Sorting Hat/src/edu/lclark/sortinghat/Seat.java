@@ -10,6 +10,11 @@ public class Seat {
         this.section = section;
     }
 
+    public Seat(Section section, boolean male) { //for gender functionality
+        this.section = section;
+        this.male = male;
+    }
+
     public Seat(Section section, boolean male, boolean athlete) {
         this.section = section;
         this.male = male;

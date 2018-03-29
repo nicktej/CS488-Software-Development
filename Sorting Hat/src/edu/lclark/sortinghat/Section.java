@@ -5,13 +5,14 @@ import java.util.*;
 public class Section {
 
     private String sectionNo;
-    private int size;
+    private int cap;
     private String prof;
     private int index;
     private ArrayList<Student> students;
 
     /**
      * I don't know why we have three different Section constructors but I think this first one is the best one?
+     *
      * @param sectionNo
      * @param prof
      * @param index
@@ -20,7 +21,7 @@ public class Section {
         this.sectionNo = sectionNo;
         this.prof = prof;
         this.index = index;
-        this.size = 19;
+        this.cap = 19;
         students = new ArrayList<>();
     }
 
@@ -30,11 +31,11 @@ public class Section {
         students = new ArrayList<>();
     }
 
-    public Section(String sectionNo, String prof, int index, int size) {
+    public Section(String sectionNo, String prof, int index, int cap) {
         this.sectionNo = sectionNo;
         this.prof = prof;
         this.index = index;
-        this.size = size;
+        this.cap = cap;
         students = new ArrayList<>();
     }
 
@@ -46,12 +47,12 @@ public class Section {
         return prof;
     }
 
-    public int getSize() {
-        return size;
+    public int getCap() {
+        return cap;
     }
 
     public boolean addStudent(Student student) {
-        if (students.size() == 19) {
+        if (students.size() == cap) {
             //TODO: Have this throw an error
             return false;
         }
@@ -76,7 +77,7 @@ public class Section {
     }
 
     public boolean hasStudent(String id) {
-        for ( int i = 0; i < students.size(); i++) {
+        for (int i = 0; i < students.size(); i++) {
             if (students.get(i).getStudentNo().equals(id)) {
                 return true;
             }
@@ -96,4 +97,29 @@ public class Section {
     public ArrayList<Student> getStudents() {
         return students;
     }
+
+    public int getNumAvailableSeats() {
+        return cap - students.size();
+    }
+
+    public int getNumMaleStudents() {
+        int n = 0;
+        for (Student stud : students) {
+            if (stud.getGender()) {
+                n++;
+            }
+        }
+        return n;
+    }
+
+    public int getNumFemaleStudents() {
+        int n = 0;
+        for (Student stud : students) {
+            if (!stud.getGender()) {
+                n++;
+            }
+        }
+        return n;
+    }
+
 }

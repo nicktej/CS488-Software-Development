@@ -11,6 +11,7 @@ public class SortingHatMain {
 
     /**
      * This launches the GUI and also contains the sorting hat rules
+     *
      * @param args
      */
     public static void main(String[] args) {
@@ -33,4 +34,7 @@ public class SortingHatMain {
 //    public void printParse() {
 //        sortingHat.run();
 //    }
+    public SortingHat getSortingHat() {
+        return sortingHat;
+    }
 }
