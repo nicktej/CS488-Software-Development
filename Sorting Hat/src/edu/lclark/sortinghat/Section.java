@@ -52,9 +52,9 @@ public class Section {
     }
 
     public boolean addStudent(Student student) {
-        if (students.size() == cap) {
-            //TODO: Have this throw an error
-            return false;
+        if (students.size() >= cap) {
+            // TODO: Launch an error dialog box in the GUI window
+            throw new IllegalArgumentException("Section is already full. Cannot add student to full section");
         }
         students.add(student);
         return true;
@@ -116,6 +116,26 @@ public class Section {
         int n = 0;
         for (Student stud : students) {
             if (!stud.getGender()) {
+                n++;
+            }
+        }
+        return n;
+    }
+
+    public int getNumFemaleNerds(){
+        int n = 0;
+        for (Student stud : students) {
+            if (!stud.getGender() && !stud.getAthlete()) {
+                n++;
+            }
+        }
+        return n;
+    }
+
+    public int getNumMaleNerds(){
+        int n = 0;
+        for (Student stud : students) {
+            if (stud.getGender() && !stud.getAthlete()) {
                 n++;
             }
         }

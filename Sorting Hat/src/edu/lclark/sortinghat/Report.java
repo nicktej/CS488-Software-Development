@@ -20,13 +20,18 @@ public class Report {
     }
 
     /**
-     * The number of students who recieve each of their preferences
+     * The number of students who receive each of their preferences
      *
-     * @return int[] the ith entry is the number of students who go their ith choice
+     * @return int[] the ith entry is the number of students who go their (i + 1)th choice
      */
     public int[] preferences() {
         int[] preferenceResults = new int[6];
         for (Student s : students) {
+
+            if (s.getPreferences().size() < 4) {  // check if student has at least 4 preferences
+                continue;
+            }
+
             ArrayList<Section> pref = s.getPreferences();
             for (int j = 0; j < pref.size(); j++) {
                 if (pref.get(j).equals(s.getAssignedSection())) {
@@ -60,7 +65,7 @@ public class Report {
         int n = 0;
         for (Student s : students) {
             //TODO how many preferences is too few?
-            if (s.getPreferences().size() > 3) {
+            if (s.getPreferences().size() >= 3) {
                 n++;
             }
         }
@@ -127,14 +132,26 @@ public class Report {
      */
     public ArrayList<String> studentsWithIllegalPreferences() {
         ArrayList<String> badStudents = new ArrayList<>();
-        for (Student s : students) {
-            for (Section p : s.getPreferences()) {
-                if (s.getIllegalSections().contains(p.getSectionNo())) {
-                    badStudents.add(s.getStudentNo());
+        for (Student student : students) {
+            for (Section preference : student.getPreferences()) {
+                if (student.getIllegalSections().contains(preference.getSectionNo())) {
+                    badStudents.add(student.getStudentNo());
                 }
             }
         }
         return badStudents;
+    }
+
+    public String getStatistics() {
+        String stat = "";
+
+        for (int i = 0; i < 6; i++) {
+            stat = stat + "The percentage of students in their number " + (i + 1) + " choice is: " + (((100 * percentages()[i]))) + "%" + "\n";
+        }
+
+        stat = stat + "The number of students who did not get any of their preferences is: " + numStudentsGotNoPreferences();
+
+        return stat;
     }
 
 }

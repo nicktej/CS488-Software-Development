@@ -33,14 +33,14 @@ public class Student {
     /**
      * Constructs a Student that is already assigned to a Section.
      */
-    public Student(String studentNo, boolean male, boolean athlete, Section assignedSection) {
+    public Student(String studentNo, ArrayList<Section> preferences, boolean male, boolean athlete, Section assignedSection) { // TODO: This is where the bug is for Max and Nick
         this.studentNo = studentNo;
         this.male = male;
+        this.preferences = new ArrayList<>(preferences);
         this.athlete = athlete;
+        this.illegalSections = new ArrayList<>();
 //        this.prevProfs = prevProfs;
         this.assignedSection = assignedSection;
-
-        preferences = new ArrayList<>();
     }
 
     public String getStudentNo() {

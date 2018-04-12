@@ -16,14 +16,12 @@ public class Output {
     private FileWriter csvOutput;
     ArrayList<Section> sections;
     ArrayList<Student> students;
-    ArrayList<Student> assigned;
 
     // Constructor creates Output
-    public Output(ArrayList<Section> sections, ArrayList<Student> students, ArrayList<Student> preassigned) {
+    public Output(ArrayList<Section> sections, ArrayList<Student> students) {
 
         this.sections = sections;
         this.students = students;
-        this.assigned = preassigned;
         StringBuilder sb = new StringBuilder();
         String outputFile = "eanddsorted.csv";
         String userHomeFolder = System.getProperty("user.home");
@@ -35,7 +33,7 @@ public class Output {
             // use FileWriter constructor that specifies open for appending
             int fileEnd = 2;
             while (alreadyExists) {
-                String testOutputFileName = "eanddsorted" + Integer.toString(fileEnd) + ".csv";
+                String testOutputFileName = "eanddsorted(" + Integer.toString(fileEnd) + ").csv";
                 alreadyExists = new File(userHomeFolder, testOutputFileName).exists();
                 fileEnd++;
                 outputFile = testOutputFileName;
@@ -49,13 +47,6 @@ public class Output {
                 sb.append("\n");
 
                 for (Student s : students) {
-                    sb.append(s.getStudentNo());
-                    sb.append(",");
-                    sb.append(s.getAssignedSection());
-                    sb.append("\n");
-                }
-
-                for (Student s : assigned) {
                     sb.append(s.getStudentNo());
                     sb.append(",");
                     sb.append(s.getAssignedSection());

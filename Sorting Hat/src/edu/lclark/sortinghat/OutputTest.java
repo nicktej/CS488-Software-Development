@@ -19,10 +19,9 @@ public class OutputTest {
     public void setUp() {
         sortingHat = new SortingHat(new File("csvparsetestSECT.csv"), new File("csvparsetestSTUD.csv"));
         sortingHat.run();
-
         students = sortingHat.getStudents();
         sections = sortingHat.getSections();
-        output = new Output(sections, students, new ArrayList<>());
+        output = new Output(sections, students);
     }
 
     @Test

@@ -21,36 +21,22 @@ public class SortingHatTest {
 
     @Before
     public void setUp() {
-//        sortingHat = new SortingHat(new File("csvparsetestSECT3.csv"), new File("csvparsetestSTUD3.csv"));
-//        sortingHat = new SortingHat(new File("csvparsetestSECT2_headers.csv"), new File("csvparsetestSTUD2_headers.csv"));
-        sortingHat = new SortingHat(new File("csvparsetestSECT.csv"), new File("csvparsetestSTUD.csv"));
+//        sortingHat = new SortingHat(new File("data/section.csv"), new File("data/student.csv")); // passes all
+          sortingHat = new SortingHat(new File("data/section_duplicates.csv"), new File("data/student_duplicates.csv"));
+//        sortingHat = new SortingHat(new File("data/section2.csv"), new File("data/student2.csv")); // fails gender balance and top choices
+//        sortingHat = new SortingHat(new File("data/section2_headers.csv"), new File("data/student2_headers.csv")); // fails gender balance and top choices
+//        sortingHat = new SortingHat(new File("data/section3.csv"), new File("data/student3.csv")); // fails gender balance, top choices, and athletes
+//        sortingHat = new SortingHat(new File("data/section4_headers.csv"), new File("data/student4_headers.csv")); // fails gender balance, top choices, and athletes
+
+        assigned = sortingHat.getAssigned();
+        assignedCopy = new ArrayList<>(assigned); // copy not pointer ?"));
         sections = sortingHat.getSections();
         students = sortingHat.getStudents();
-        assigned = sortingHat.getAssigned();
-        assignedCopy = new ArrayList<>(assigned); // copy not pointer ?
         report = new Report(sections, students);
         double time1 = System.nanoTime();
         sortingHat.sortHungarian();
         double time2 = System.nanoTime();
         //System.out.println(time2 - time1);
-    }
-
-    @Test
-    public void studentCreatedFromCSV() {
-        studentA = students.get(0);
-//        Assert.assertEquals(true, studentA.getGender());
-    }
-
-    @Test
-    public void sectionCreatedFromCSV() {
-        sectionA = sections.get(0);
-//        Assert.assertEquals("Beck", sectionA.getProf()); // for csvparsetestSECT and csvparsetestSTUD
-//        Assert.assertEquals("DRAYTON", sectionA.getProf()); // for csvparsetestSECT2 and csvparsetestSTUD2
-    }
-
-    @Test
-    public void preferencesNotEmpty() {
-        Assert.assertTrue(students.get(1).getPreferences().size() > 0);
     }
 
     @Test
@@ -82,18 +68,18 @@ public class SortingHatTest {
 
 
     @Test
-    public void sortSetsSectionsForEveryStudent() {
+    public void everyStudentGetsAssigned() {
         // Check that the section field of every student is set.
         for (int i = 0; i < students.size(); i++) {
-            Assert.assertNotNull(students.get(i).getAssignedSection());
+            Assert.assertTrue(students.get(i).isAssigned());
         }
 
     }
 
     @Test
-    public void sortSetsAppropriateSizeSection() {
-        for (int i = 0; i < sections.size(); i++) {
-            Assert.assertTrue(sections.get(i).getNumStudents() < 20);   // 20 is arbitrary max size
+    public void sortSetsAppropriateSectionSize() {
+        for (Section sec : sections) {
+            Assert.assertTrue(sec.getNumStudents() <= sec.getCap());
         }
     }
 
@@ -146,7 +132,7 @@ public class SortingHatTest {
     }
 
     @Test
-    public void noStudentRecievesIllegalSection() {
+    public void noStudentReceivesIllegalSection() {
 //        for(Section s: sections){
 //            System.out.println(s.getProf());
 //        }
@@ -154,9 +140,7 @@ public class SortingHatTest {
             for (String illegalSection : s.getIllegalSections()) {
                 //System.out.println(s.getStudentNo() + " " + p + " " + s.getSection().getProf());
                 //students without a previous professor will have the the empty string in the prevprof field
-                if (!illegalSection.equals("")) {
-                    Assert.assertFalse(s.getIllegalSections().contains(s.getAssignedSection()));
-                }
+                Assert.assertFalse(illegalSection.equals(s.getAssignedSection().getSectionNo()));
             }
         }
     }
@@ -240,11 +224,92 @@ public class SortingHatTest {
     }
 
     @Test
+    public void sortMakesAthleteBalancedClasses() {
+        for (Section sec : sections) {
+            int numAthletes = 0;
+            for (Student stud : sec.getStudents()) {
+                if (stud.getAthlete()) {
+                    numAthletes++;
+                }
+            }
+            System.out.println((numAthletes + 0.0) / sec.getNumStudents());
+            System.out.println(sec.getSectionNo());
+            System.out.println(sec.getNumStudents());
+
+            if (sec.getNumStudents() < 10) {
+                Assert.assertTrue((numAthletes + 0.0) / sec.getNumStudents() <= 0.45);
+                continue;
+            }
+            Assert.assertTrue((numAthletes + 0.0) / sec.getNumStudents() <= 0.45);
+        }
+    }
+
+    @Test
+    public void sortLimitsSpecificSports(){
+        for (Section sec: sections){
+
+        }
+    }
+
+    @Test
     public void sortDoesNotChangeAssignedStudents() {
 //        Assert.assertTrue(false);
         for (Student s : assigned) {
             Assert.assertTrue(assignedCopy.contains(s));
         }
     }
+
+    @Test
+    public void thereAreGenders() {
+        int femaleCount = 0;
+        for (Student s : students) {
+            if (s.getGender()) {
+                femaleCount++;
+            }
+        }
+        Assert.assertTrue(femaleCount > 10);
+    }
+
+    @Test
+    public void thereAreAthletes() {
+        int athleteCount = 0;
+        for (Student s : students) {
+            if (s.getAthlete()) {
+                athleteCount++;
+            }
+        }
+        Assert.assertTrue(athleteCount > 10);
+    }
+
+    @Test
+    public void correctNumberOfCourses() {
+        for (Section s : sections) {
+            System.out.println(s.getSectionNo());
+            Assert.assertFalse(s.getSectionNo().contains("co"));
+        }
+//        Assert.assertTrue(sections.size() == );
+    }
+
+    @Test
+    public void correctNumberOfStudents() {
+        for (Student s : students) {
+            System.out.println(s.getStudentNo());
+            Assert.assertFalse(s.getStudentNo().contains("i"));
+        }
+        System.out.println("total parsed students = " + (students.size() + assigned.size()));
+//        System.out.println("total parsed students = " + students.size());
+//        System.out.println("total parsed students = " + assigned.size());
+    }
+
+//    @Test
+//    public void thereAreDuplicateIDs() {
+//        Assert.assertTrue(sortingHat.getDuplicateIDs().size() > 0);
+//        System.out.println(sortingHat.getDuplicateIDs());
+//    }
+
+//    @Test
+//    public void isStudentHeader() {
+//        Assert.assertTrue(sortingHat.getParser().isStudentHeader());
+//    }
 
 }

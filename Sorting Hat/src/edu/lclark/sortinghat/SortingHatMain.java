@@ -26,6 +26,7 @@ public class SortingHatMain {
     public SortingHatMain(String sectionSelectedFile, String studentSelectedFile) {
         sortingHat = new SortingHat(new File(sectionSelectedFile), new File(studentSelectedFile));
         sortingHat.run();
+        new Output(sortingHat.getSections(), sortingHat.getStudents());
     }
 
     /**

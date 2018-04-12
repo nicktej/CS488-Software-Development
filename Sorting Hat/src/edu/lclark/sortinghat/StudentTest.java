@@ -25,7 +25,7 @@ public class StudentTest {
         preferences.add(pref3);
 //        prevProfs = new ArrayList<>();
 //        prevProfs.add("Drake");
-        student = new Student("420", preferences, true, false, null);
+        student = new Student("420", preferences, true, false, (Section) null);
     }
 
     @Test
