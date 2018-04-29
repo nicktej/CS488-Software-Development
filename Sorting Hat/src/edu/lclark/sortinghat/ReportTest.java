@@ -18,7 +18,7 @@ public class ReportTest {
 
     @Before
     public void setUp() {
-        sortingHat = new SortingHat(new File("csvparsetestSECT.csv"), new File("csvparsetestSTUD.csv"));
+        sortingHat = new SortingHat(new File("csvparsetestSECT.csv"), new File("csvparsetestSTUD.csv"), true, true);
         sections = sortingHat.getSections();
         students = sortingHat.getStudents();
         report = new Report(sections, students);

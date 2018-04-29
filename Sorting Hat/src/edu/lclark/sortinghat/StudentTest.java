@@ -25,15 +25,15 @@ public class StudentTest {
         preferences.add(pref3);
 //        prevProfs = new ArrayList<>();
 //        prevProfs.add("Drake");
-        student = new Student("420", preferences, true, false, (Section) null);
+        student = new Student("420", preferences, true, false, new ArrayList<String>(), (Section) null);
     }
 
     @Test
     public void studentCreated() {
         Assert.assertEquals(student.getStudentNo(), "420");
         Assert.assertEquals(student.getPreferences(), preferences);
-        Assert.assertEquals(student.getGender(), true);
-        Assert.assertEquals(student.getAthlete(), false);
+        Assert.assertEquals(student.isMale(), true);
+        Assert.assertEquals(student.isAthlete(), false);
 //        Assert.assertEquals(student.getPrevProfs().get(0), "Drake");
     }
 }

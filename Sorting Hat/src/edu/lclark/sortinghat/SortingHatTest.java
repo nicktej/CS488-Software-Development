@@ -6,6 +6,7 @@ import org.junit.Assert;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class SortingHatTest {
@@ -22,11 +23,11 @@ public class SortingHatTest {
     @Before
     public void setUp() {
 //        sortingHat = new SortingHat(new File("data/section.csv"), new File("data/student.csv")); // passes all
-          sortingHat = new SortingHat(new File("data/section_duplicates.csv"), new File("data/student_duplicates.csv"));
-//        sortingHat = new SortingHat(new File("data/section2.csv"), new File("data/student2.csv")); // fails gender balance and top choices
-//        sortingHat = new SortingHat(new File("data/section2_headers.csv"), new File("data/student2_headers.csv")); // fails gender balance and top choices
-//        sortingHat = new SortingHat(new File("data/section3.csv"), new File("data/student3.csv")); // fails gender balance, top choices, and athletes
-//        sortingHat = new SortingHat(new File("data/section4_headers.csv"), new File("data/student4_headers.csv")); // fails gender balance, top choices, and athletes
+          sortingHat = new SortingHat(new File("data/section_duplicates.csv"), new File("data/student_duplicates.csv"),true, false);
+//        sortingHat = new SortingHat(new File("data/section2.csv"), new File("data/student2.csv"), true, false); // fails gender balance and top choices
+//        sortingHat = new SortingHat(new File("data/section2_headers.csv"), new File("data/student2_headers.csv"), true, false); // fails gender balance and top choices
+//        sortingHat = new SortingHat(new File("data/section3.csv"), new File("data/student3.csv"), true, false); // fails gender balance, top choices, and athletes
+//        sortingHat = new SortingHat(new File("data/section4_headers.csv"), new File("data/student4_headers.csv"), true, false); // fails gender balance, top choices, and athletes
 
         assigned = sortingHat.getAssigned();
         assignedCopy = new ArrayList<>(assigned); // copy not pointer ?"));
@@ -38,6 +39,49 @@ public class SortingHatTest {
         double time2 = System.nanoTime();
         //System.out.println(time2 - time1);
     }
+
+    @Test
+    public void numberSameSportLessThanThree() {
+        String s = report.worstSpecificSport();
+        System.out.println(s);
+        Assert.assertTrue(s.isEmpty());
+    }
+
+    @Test
+    public void shuffleDoesNotChangeCost() {
+        ArrayList<SortingHat> hats = new ArrayList<>(10);
+        for (int i = 0; i < 10; i++) {
+            hats.add(new SortingHat(new File("data/section_duplicates.csv"), new File("data/student_duplicates.csv"),true, true));
+            hats.get(i).run();
+            System.out.println(hats.get(i).getCost());
+        }
+    }
+
+    @Test
+    public void shuffleChangesAssignments() {
+        int loops = 2;
+        ArrayList<SortingHat> hats = new ArrayList<>(loops);
+        ArrayList<ArrayList<Student>> students = new ArrayList<>(loops);
+        for (int i = 0; i < loops; i++) {
+            hats.add(new SortingHat(new File("data/section_duplicates.csv"), new File("data/student_duplicates.csv"), true, true));
+            hats.get(i).run();
+            ArrayList<Student> temp = hats.get(i).getStudents();
+            Collections.sort(temp);
+            students.add(temp);
+
+        }
+
+        ArrayList<Student> differences = new ArrayList<>();
+        for (int i = 0; i < students.get(0).size(); i++) { //
+            if (students.get(0).get(i).compareTo(students.get(1).get(i)) == 0) {
+                differences.add(students.get(0).get(i));
+                System.out.println(students.get(0).get(i));
+            }
+        }
+
+        Assert.assertFalse(differences.isEmpty());
+    }
+
 
     @Test
     public void numStudentsLessThanNumSeats() {
@@ -204,16 +248,25 @@ public class SortingHatTest {
 
     @Test
     public void sortMakesGenderBalancedClasses() {
+        double worstRatio = 1;
+        Section worstSection = sections.get(0);
+
         for (Section sec : sections) {
             int numMales = 0;
             for (Student stud : sec.getStudents()) {
-                if (stud.getGender()) {
+                if (stud.isMale()) {
                     numMales++;
                 }
             }
-            System.out.println((numMales + 0.0) / sec.getNumStudents());
-            System.out.println(sec.getSectionNo());
-            System.out.println(sec.getNumStudents());
+
+            if (worstRatio > (numMales + 0.0) / sec.getNumStudents()) {
+                worstRatio = (numMales + 0.0) / sec.getNumStudents();
+                worstSection = sec;
+            }
+
+//            System.out.println((numMales + 0.0) / sec.getNumStudents());
+//            System.out.println(sec.getSectionNo());
+//            System.out.println(sec.getNumStudents());
 
             if (sec.getNumStudents() < 10) {
                 Assert.assertTrue((numMales + 0.0) / sec.getNumStudents() >= 0.20 && (numMales + 0.0) / sec.getNumStudents() <= 0.80);
@@ -221,34 +274,56 @@ public class SortingHatTest {
             }
             Assert.assertTrue((numMales + 0.0) / sec.getNumStudents() >= 0.30 && (numMales + 0.0) / sec.getNumStudents() <= 0.70);
         }
+
+        System.out.println("Section " + worstSection + " had the worst gender ratio: " + worstRatio);
     }
 
     @Test
     public void sortMakesAthleteBalancedClasses() {
+        double worstRatio = 0;
+        Section worstSection = sections.get(0);
+
         for (Section sec : sections) {
-            int numAthletes = 0;
+            int numJocks = 0;
             for (Student stud : sec.getStudents()) {
-                if (stud.getAthlete()) {
-                    numAthletes++;
+                if (stud.isAthlete()) {
+                    numJocks++;
                 }
             }
-            System.out.println((numAthletes + 0.0) / sec.getNumStudents());
-            System.out.println(sec.getSectionNo());
-            System.out.println(sec.getNumStudents());
+
+//            System.out.println((numJocks + 0.0) / sec.getNumStudents());
+//            System.out.println(sec.getSectionNo());
+//            System.out.println(sec.getNumStudents());
+
+            if (worstRatio < (numJocks + 0.0) / sec.getNumStudents()) {
+                worstRatio = (numJocks + 0.0) / sec.getNumStudents();
+                worstSection = sec;
+            }
 
             if (sec.getNumStudents() < 10) {
-                Assert.assertTrue((numAthletes + 0.0) / sec.getNumStudents() <= 0.45);
+                Assert.assertTrue((numJocks + 0.0) / sec.getNumStudents() <= 0.45);
                 continue;
             }
-            Assert.assertTrue((numAthletes + 0.0) / sec.getNumStudents() <= 0.45);
+            Assert.assertTrue((numJocks + 0.0) / sec.getNumStudents() <= 0.45);
         }
-    }
 
-    @Test
-    public void sortLimitsSpecificSports(){
-        for (Section sec: sections){
+        System.out.println("Section " + worstSection + " had the worst athlete ratio: " + worstRatio);
 
-        }
+//        for (Section sec : sections) {
+//            int numAthletes = 0;
+//            for (Student stud : sec.getStudents()) {
+//                if (stud.isAthlete()) {
+//                    numAthletes++;
+//                }
+//            }
+//
+//
+//            if (sec.getNumStudents() < 10) {
+//                Assert.assertTrue((numAthletes + 0.0) / sec.getNumStudents() <= 0.45);
+//                continue;
+//            }
+//            Assert.assertTrue((numAthletes + 0.0) / sec.getNumStudents() <= 0.45);
+//        }
     }
 
     @Test
@@ -263,7 +338,7 @@ public class SortingHatTest {
     public void thereAreGenders() {
         int femaleCount = 0;
         for (Student s : students) {
-            if (s.getGender()) {
+            if (s.isMale()) {
                 femaleCount++;
             }
         }
@@ -274,7 +349,7 @@ public class SortingHatTest {
     public void thereAreAthletes() {
         int athleteCount = 0;
         for (Student s : students) {
-            if (s.getAthlete()) {
+            if (s.isAthlete()) {
                 athleteCount++;
             }
         }

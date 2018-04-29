@@ -1,12 +1,14 @@
 package edu.lclark.sortinghat;
 
-import java.lang.reflect.Array;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
 
 public class Report {
 
-    ArrayList<Student> students;
-    ArrayList<Section> sections;
+    private ArrayList<Student> students;
+    private ArrayList<Section> sections;
 
     /**
      * Construct a Report
@@ -59,7 +61,7 @@ public class Report {
     }
 
     /**
-     * @return The number of students who list at least 4 preferences
+     * @return The number of students who list at least 3 preferences
      */
     public int numStudentsWithPreferences() {
         int n = 0;
@@ -93,7 +95,7 @@ public class Report {
     public int numMales() {
         int n = 0;
         for (Student s : students) {
-            if (s.getGender()) {
+            if (s.isMale()) {
                 n++;
             }
         }
@@ -142,11 +144,122 @@ public class Report {
         return badStudents;
     }
 
+    /**
+     * Gets the sections with more than 2 athletes in a specific sport
+     * @return
+     */
+    public String worstSpecificSport() {
+        ArrayList<Student> tooManyAthletes = new ArrayList<>();
+
+        String result = "";
+        int worstCase = 0;
+
+        for (Section section : sections) {
+            Hashtable<String, Integer> map = new Hashtable<>();
+            for (Student student : section.getStudents()) {
+                if (student.isAthlete()) {
+                    for (String sport : student.getSports()) {
+                        if (map.containsKey(sport)) {
+                            map.replace(sport, map.get(sport) + 1);
+                        } else {
+                            map.put(sport, 1);
+                        }
+                    }
+                }
+            }
+
+            // don't check for too many specific athletes if there aren't any
+            if (map.values().isEmpty()) {
+                continue;
+            }
+
+            // find and report sections with too many specific sport playaz
+            ArrayList<String> manySports = new ArrayList<>();
+            for (String sport : map.keySet()) {
+                if (map.get(sport) > 2) {
+                    if (!manySports.contains(sport)) {
+                        manySports.add(sport);
+                    }
+                }
+            }
+
+            if (Collections.max(map.values()) > 2) {
+                result += "Section " + section + " has too many athletes in the following sports: \n";
+                for (String sport : manySports) {
+                    result += "\t" + sport + ": ";
+                    for (Student student : section.getStudents()) {
+                        if (student.isAthlete() && student.getSports().contains(sport)) {
+                            result += student + " ";
+                        }
+                    }
+                    result += "\n\n";
+                }
+            }
+
+            worstCase = Math.max(worstCase, Collections.max(map.values()));
+        }
+
+        if (result.isEmpty()) {
+            result += "There were no more than 2 athletes of a specific sport in any section\n";
+        }
+
+        return result;
+    }
+
+    public String worstGenderRatio() {
+        double worstRatio = 1;
+        Section worstSection = sections.get(0);
+
+        for (Section sec : sections) {
+            int numMales = 0;
+            for (Student stud : sec.getStudents()) {
+                if (stud.isMale()) {
+                    numMales++;
+                }
+            }
+
+            if (worstRatio > (numMales + 0.0) / sec.getNumStudents()) {
+                worstRatio = (numMales + 0.0) / sec.getNumStudents();
+                worstSection = sec;
+            }
+        }
+        DecimalFormat df = new DecimalFormat("#.##");
+        return "Section " + worstSection + " had the worst gender ratio: " + df.format(100*worstRatio) + "%";
+    }
+
+    /***
+     *
+     * @return
+     */
+    public String worstAthleteRatio() {
+        double worstRatio = 0;
+        Section worstSection = sections.get(0);
+
+        for (Section sec : sections) {
+            int numJocks = 0;
+            for (Student stud : sec.getStudents()) {
+                if (stud.isAthlete()) {
+                    numJocks++;
+                }
+            }
+
+            if (worstRatio < (numJocks + 0.0) / sec.getNumStudents()) {
+                worstRatio = (numJocks + 0.0) / sec.getNumStudents();
+                worstSection = sec;
+            }
+        }
+
+        DecimalFormat df = new DecimalFormat("#.##");
+        return "Section " + worstSection + " had the worst athlete ratio: " + df.format(100*worstRatio) + "%";
+    }
+
     public String getStatistics() {
         String stat = "";
 
+        DecimalFormat df = new DecimalFormat("#.##");
+
         for (int i = 0; i < 6; i++) {
-            stat = stat + "The percentage of students in their number " + (i + 1) + " choice is: " + (((100 * percentages()[i]))) + "%" + "\n";
+            stat = stat + "The percentage of students in their number " + (i + 1) + " choice is: " + df.format((((100 * percentages()[i])))) + "%" + "\n";
         }
 
         stat = stat + "The number of students who did not get any of their preferences is: " + numStudentsGotNoPreferences();

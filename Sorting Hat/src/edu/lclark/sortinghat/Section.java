@@ -9,6 +9,7 @@ public class Section {
     private String prof;
     private int index;
     private ArrayList<Student> students;
+    private static final int DEFAULT_CAP = 19;
 
     /**
      * I don't know why we have three different Section constructors but I think this first one is the best one?
@@ -21,7 +22,7 @@ public class Section {
         this.sectionNo = sectionNo;
         this.prof = prof;
         this.index = index;
-        this.cap = 19;
+        this.cap = DEFAULT_CAP;
         students = new ArrayList<>();
     }
 
@@ -105,7 +106,7 @@ public class Section {
     public int getNumMaleStudents() {
         int n = 0;
         for (Student stud : students) {
-            if (stud.getGender()) {
+            if (stud.isMale()) {
                 n++;
             }
         }
@@ -115,7 +116,7 @@ public class Section {
     public int getNumFemaleStudents() {
         int n = 0;
         for (Student stud : students) {
-            if (!stud.getGender()) {
+            if (!stud.isMale()) {
                 n++;
             }
         }
@@ -125,7 +126,7 @@ public class Section {
     public int getNumFemaleNerds(){
         int n = 0;
         for (Student stud : students) {
-            if (!stud.getGender() && !stud.getAthlete()) {
+            if (!stud.isMale() && !stud.isAthlete()) {
                 n++;
             }
         }
@@ -135,7 +136,7 @@ public class Section {
     public int getNumMaleNerds(){
         int n = 0;
         for (Student stud : students) {
-            if (stud.getGender() && !stud.getAthlete()) {
+            if (stud.isMale() && !stud.isAthlete()) {
                 n++;
             }
         }

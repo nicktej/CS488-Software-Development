@@ -17,7 +17,7 @@ public class OutputTest {
 
     @Before
     public void setUp() {
-        sortingHat = new SortingHat(new File("csvparsetestSECT.csv"), new File("csvparsetestSTUD.csv"));
+        sortingHat = new SortingHat(new File("csvparsetestSECT.csv"), new File("csvparsetestSTUD.csv"), true, true);
         sortingHat.run();
         students = sortingHat.getStudents();
         sections = sortingHat.getSections();

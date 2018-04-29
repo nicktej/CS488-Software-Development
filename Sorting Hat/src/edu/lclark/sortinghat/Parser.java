@@ -16,6 +16,12 @@ public class Parser {
     private boolean sectionHeader;
     private boolean studentHeader;
 
+    private String sectionsHeaderError;
+    private String studentsHeaderError;
+
+    private boolean sectionsHeaderErrorBool = false;
+    private boolean studentsHeaderErrorBool = false;
+
     public Parser(File sectionsFile, File studentsFile) {
         idFrequencyTable = new Hashtable<>();
 
@@ -62,7 +68,7 @@ public class Parser {
 
         row.replaceAll(String::toLowerCase);
 
-        boolean header = row.get(0).contains("co") || row.get(0).toLowerCase().startsWith("prof")
+        boolean header = row.get(0).contains("co") || row.get(0).startsWith("prof")
                 || possibleCapNames.contains(row.get(0));
 
         sectionHeader = header;
@@ -77,6 +83,9 @@ public class Parser {
                         professorIndex = i;
                     } else if (possibleCapNames.contains(row.get(i))) {
                         capIndex = i;
+                    } else {
+                        sectionsHeaderError = "Could not interpret header: " + row.get(i) + ". Please fix header!";
+                        sectionsHeaderErrorBool = true;
                     }
                 }
             }
@@ -215,14 +224,13 @@ public class Parser {
                 id = row.get(headerMap.get("identifying number"));
             } else if (headerMap.containsKey("id")) {
                 id = row.get(headerMap.get("id"));
+            } else {
+                studentsHeaderError = "Could not find student ID header";
+                studentsHeaderErrorBool = true;
+                return;
             }
 
-            // TODO: This is not working
             // search for duplicate student IDs
-            if (id.equals("1792")) {
-                System.out.println("did we see 1792 already???? " + idFrequencyTable.containsKey(id));
-            }
-
             if (idFrequencyTable.containsKey(id)) {
                 idFrequencyTable.replace(id, idFrequencyTable.get(id) + 1);
             } else {
@@ -237,24 +245,47 @@ public class Parser {
                 male = row.get(headerMap.get("m / f")).equals("m") || row.get(headerMap.get("m / f")).equals("m");
             }
 
-
+            // Are they and athlete?
             boolean athlete = row.get(headerMap.get("athlete")).equals("y") || row.get(headerMap.get("athlete")).equals("y");
+
+            // Specific sport
+            ArrayList<String> sports = new ArrayList<>();
+            sports.add("");
+            if (athlete) {
+                if (row.get(headerMap.get("sport")) != null) {
+                    sports = parseIllegalSections(row.get(headerMap.get("sport"))); // rename "Parse illegeal Sections"
+                }
+            }
 
             // Adding preference
             ArrayList<Section> preferences = new ArrayList<>(); // TODO: reference already parsed sections arraylist
 
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 6; i++) {
+                boolean b = false;
                 for (Section s : sections) {
+                    if (row.get(headerMap.get("choice 1") + i).isEmpty()) {
+                        b = true;
+                        break;
+                    }
                     if (s.getSectionNo().equals(row.get(headerMap.get("choice 1") + i))) {
                         preferences.add(sections.get(s.getIndex() - 1)); // Goes out of bounds (removed a -1 and it works!)
+                        b = true;
+                        break;
                     }
                 }
+                if (!b) {
+                    studentsHeaderError = "Student " + id + " listed a section that does not exist ("
+                            + row.get(headerMap.get("choice 1") + i) + ")" + "\n Are you sure these data files are compatible?";
+                    studentsHeaderErrorBool = true;
+                    return;
+                }
+            }
 
             // Adds pre-assigned students to assigned<>
             if (!row.get(headerMap.get("placement")).isEmpty()) { //TODO: MAke sure this works
                 for (Section s : sections) {
                     if (s.getSectionNo().equals(row.get(headerMap.get("placement")))) {
-                        Student peter = new Student(id, preferences, male, athlete, s); // peter is an preassigned student
+                        Student peter = new Student(id, preferences, male, athlete, sports, s); // peter is an preassigned student
                         if (!s.addStudent(peter)) {
                             System.out.println("ERROR! Could not pre-assign student to section.");
                         }
@@ -264,6 +295,7 @@ public class Parser {
                 }
                 continue;
             }
+
             // illegal sections
             String illegal = "";
             if (headerMap.containsKey("section #'s can't be placed into (due to prev professor)")) {
@@ -275,7 +307,7 @@ public class Parser {
             //parse illegal sections
             ArrayList<String> illegalSections = parseIllegalSections(illegal);
 
-            students.add(new Student(id, preferences, male, athlete, illegalSections));
+            students.add(new Student(id, preferences, male, athlete, sports, illegalSections));
         }
     }
 
@@ -330,6 +362,22 @@ public class Parser {
 
     public boolean isStudentHeader() {
         return studentHeader;
+    }
+
+    public String getSectionsHeaderError() {
+        return sectionsHeaderError;
+    }
+
+    public String getStudentsHeaderError() {
+        return studentsHeaderError;
+    }
+
+    public boolean isSectionsHeaderErrorBool() {
+        return sectionsHeaderErrorBool;
+    }
+
+    public boolean isStudentsHeaderErrorBool() {
+        return studentsHeaderErrorBool;
     }
 
     public static void main(String[] args) {
