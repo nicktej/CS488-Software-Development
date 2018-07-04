@@ -19,6 +19,6 @@ Link: https://en.wikipedia.org/wiki/Machi_Koro
 Peter Drake, Lewis &amp; Clark College
 
 ### Images
-
-
-
+<img width="1004" alt="1" src="https://user-images.githubusercontent.com/25356323/42296514-92cb9c5e-7fab-11e8-82c6-c2bdcac5e9f7.png">
+<img width="999" alt="2" src="https://user-images.githubusercontent.com/25356323/42296515-92ef253e-7fab-11e8-8374-0aaade06e466.png">
+<img width="998" alt="3" src="https://user-images.githubusercontent.com/25356323/42296516-9303bf9e-7fab-11e8-962b-42f06dead0dc.png">
